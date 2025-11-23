@@ -13,10 +13,10 @@ from typing import List, Dict
 # =============================================================================
 # Reddit API Configuration (Get these from https://www.reddit.com/prefs/apps)
 REDDIT_CONFIG = {
-    'client_id': os.getenv('REDDIT_CLIENT_ID', 'YOUR_CLIENT_ID'),
-    'client_secret': os.getenv('REDDIT_CLIENT_SECRET', 'YOUR_CLIENT_SECRET'),
-    'username': os.getenv('REDDIT_USERNAME', 'YOUR_USERNAME'),
-    'password': os.getenv('REDDIT_PASSWORD', 'YOUR_PASSWORD'),
+    'client_id': os.getenv('REDDIT_CLIENT_ID'),
+    'client_secret': os.getenv('REDDIT_CLIENT_SECRET'),
+    'username': os.getenv('REDDIT_USERNAME'),
+    'password': os.getenv('REDDIT_PASSWORD'),
     'user_agent': 'ChatGPT_Prompt_Curator/1.0'
 }
 
@@ -29,17 +29,21 @@ PRODUCT_INFO = {
 }
 
 # Subreddit Targets with Custom Post Templates
+# NOTE: 'flair' should be the flair ID (not text). To get flair IDs:
+# 1. Check subreddit's flair options in Reddit
+# 2. Use reddit.subreddit('name').flair.link_templates to list available flairs
+# 3. Set to None to post without flair
 SUBREDDIT_TARGETS = [
     {
         'subreddit': 'ChatGPT',
         'title': 'I curated 20 tested ChatGPT prompts for [Category] - with usage guides',
-        'flair': 'Resources',
+        'flair': None,  # Set to actual flair_id if you have it
         'delay_minutes': 0
     },
     {
         'subreddit': 'ChatGPTPromptGenius',
         'title': '[Resource] 20 Professional ChatGPT Prompts for [Category]',
-        'flair': 'Prompt',
+        'flair': None,  # Set to actual flair_id if you have it
         'delay_minutes': 30
     },
     {
@@ -109,8 +113,9 @@ def validate_config() -> bool:
     required_fields = ['client_id', 'client_secret', 'username', 'password']
     
     for field in required_fields:
-        if REDDIT_CONFIG[field].startswith('YOUR_'):
+        if not REDDIT_CONFIG[field]:
             print(f"❌ Error: {field} not configured")
+            print(f"   Set environment variable: REDDIT_{field.upper()}")
             return False
     
     return True
@@ -140,6 +145,26 @@ def create_reddit_instance():
     except Exception as e:
         print(f"❌ Authentication failed: {e}")
         return None
+
+
+def list_subreddit_flairs(reddit, subreddit_name: str):
+    """Helper function to list available flairs for a subreddit"""
+    try:
+        subreddit = reddit.subreddit(subreddit_name)
+        flairs = list(subreddit.flair.link_templates)
+        
+        if not flairs:
+            print(f"r/{subreddit_name}: No flairs available or not accessible")
+            return
+        
+        print(f"\nr/{subreddit_name} available flairs:")
+        for flair in flairs:
+            print(f"  - ID: {flair['id']}")
+            print(f"    Text: {flair['text']}")
+            print(f"    Type: {flair['type']}")
+            print()
+    except Exception as e:
+        print(f"❌ Error getting flairs for r/{subreddit_name}: {e}")
 
 
 def format_post_content(category: str, bullet_points: List[str]) -> str:
@@ -221,11 +246,14 @@ def wait_with_progress(minutes: int):
     
     print(f"\n⏳ Waiting {minutes} minutes before next post...")
     
-    for remaining in range(minutes * 60, 0, -30):
+    # Adjust update interval based on wait time (60s for longer waits, 30s for shorter)
+    update_interval = 60 if minutes >= 5 else 30
+    
+    for remaining in range(minutes * 60, 0, -update_interval):
         mins = remaining // 60
         secs = remaining % 60
         print(f"   Time remaining: {mins:02d}:{secs:02d}", end='\r')
-        time.sleep(30)
+        time.sleep(update_interval)
     
     print("\n   ✅ Wait complete!")
 
@@ -341,7 +369,25 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Cross-post ChatGPT prompts to Reddit')
     parser.add_argument('--live', action='store_true', help='Actually post (default is dry-run)')
     parser.add_argument('--category', default='Productivity', help='Product category')
+    parser.add_argument('--list-flairs', action='store_true', help='List available flairs for all target subreddits')
     
     args = parser.parse_args()
+    
+    # If list-flairs is requested, just list flairs and exit
+    if args.list_flairs:
+        print("=" * 70)
+        print("Listing Subreddit Flairs")
+        print("=" * 70)
+        
+        reddit = create_reddit_instance()
+        if not reddit:
+            print("\n❌ Failed to authenticate. Check your credentials.")
+            exit(1)
+        
+        for target in SUBREDDIT_TARGETS:
+            list_subreddit_flairs(reddit, target['subreddit'])
+        
+        print("\n💡 To use a flair, copy the 'ID' value and set it in SUBREDDIT_TARGETS")
+        exit(0)
     
     main(dry_run=not args.live, category=args.category)

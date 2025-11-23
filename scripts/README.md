@@ -59,6 +59,13 @@ python reddit_crosspost.py
 
 This will show you what would be posted without actually posting.
 
+### List Available Flairs
+```bash
+python reddit_crosspost.py --list-flairs
+```
+
+This will show all available post flairs for each target subreddit. Use this to find flair IDs before posting.
+
 ### Live Posting
 ```bash
 python reddit_crosspost.py --live
@@ -80,6 +87,8 @@ The script posts to these subreddits by default:
 - r/ArtificialIntelligence
 - r/SideProject
 
+**Note**: Post flairs are set to None by default. Use `--list-flairs` to find available flair IDs for each subreddit.
+
 ### Posting Schedule
 Posts are staggered with delays between each subreddit to avoid appearing as spam:
 - Subreddit 1: Immediate
@@ -96,7 +105,7 @@ Edit the `SUBREDDIT_TARGETS` list in the script:
 {
     'subreddit': 'SubredditName',
     'title': 'Your custom title for this subreddit',
-    'flair': 'Flair Text',  # or None
+    'flair': 'flair_id_here',  # Use --list-flairs to find ID, or None
     'delay_minutes': 150  # minutes after previous post
 }
 ```
