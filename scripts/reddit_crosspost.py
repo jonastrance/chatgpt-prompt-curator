@@ -11,6 +11,11 @@ from typing import List, Dict
 
 # CONFIGURATION
 # =============================================================================
+# Progress Display Configuration
+PROGRESS_UPDATE_INTERVAL_SHORT = 30  # seconds, for waits < 5 minutes
+PROGRESS_UPDATE_INTERVAL_LONG = 60   # seconds, for waits >= 5 minutes
+PROGRESS_UPDATE_THRESHOLD = 5        # minutes, threshold for choosing interval
+
 # Reddit API Configuration (Get these from https://www.reddit.com/prefs/apps)
 REDDIT_CONFIG = {
     'client_id': os.getenv('REDDIT_CLIENT_ID'),
@@ -226,7 +231,7 @@ def post_to_subreddit(reddit, target: Dict, content: str, dry_run: bool = True) 
         submission = subreddit.submit(
             title=title,
             selftext=content,
-            flair_id=flair  # You'll need to get flair IDs from each subreddit
+            flair_id=flair
         )
         
         print(f"   ✅ Posted successfully!")
@@ -246,8 +251,10 @@ def wait_with_progress(minutes: int):
     
     print(f"\n⏳ Waiting {minutes} minutes before next post...")
     
-    # Adjust update interval based on wait time (60s for longer waits, 30s for shorter)
-    update_interval = 60 if minutes >= 5 else 30
+    # Adjust update interval based on wait time
+    update_interval = (PROGRESS_UPDATE_INTERVAL_LONG 
+                      if minutes >= PROGRESS_UPDATE_THRESHOLD 
+                      else PROGRESS_UPDATE_INTERVAL_SHORT)
     
     for remaining in range(minutes * 60, 0, -update_interval):
         mins = remaining // 60
