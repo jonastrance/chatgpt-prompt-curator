@@ -17,6 +17,8 @@ Perfect for creators who want to monetize their AI expertise by selling prompt p
 
 ## 🚀 Quick Start
 
+**New to this? Start here:** [5-Minute Quick Start Guide](QUICK_START.md) 
+
 ### View All Prompts
 Browse the complete collection in **[PROMPTS_INDEX.md](PROMPTS_INDEX.md)** - organized by category with quick reference table.
 
@@ -26,6 +28,8 @@ Browse the complete collection in **[PROMPTS_INDEX.md](PROMPTS_INDEX.md)** - org
 3. Copy the prompt section
 4. Paste into ChatGPT and fill in your details
 5. Follow the usage guide for best results
+
+See [QUICK_START.md](QUICK_START.md) for a detailed walkthrough with examples.
 
 ### Sell on Gumroad
 1. Review the **[Gumroad Listing Template](templates/gumroad-listing-template.md)**
@@ -186,6 +190,7 @@ cat prompts/productivity/01-task-prioritizer.md
 
 ## 📖 Documentation
 
+- **[Quick Start Guide](QUICK_START.md)** - Get started in 5 minutes
 - **[Complete Prompt Index](PROMPTS_INDEX.md)** - All 20 prompts with descriptions
 - **[Gumroad Template](templates/gumroad-listing-template.md)** - Product listing guide
 - **[Reddit Script Guide](scripts/README.md)** - Automation setup
