@@ -148,7 +148,7 @@ A: You'll get clean, organized files in PDF and Markdown format.
 ---
 
 📧 Questions? Email: [your-email@example.com]
-🐦 Follow for updates: [@yourtwitterhandle]
+🐦 Follow for updates: [@yourhandle] (Twitter/X)
 💬 Join our community: [discord/community link]
 
 © [Year] [Your Name/Brand]. All rights reserved.
